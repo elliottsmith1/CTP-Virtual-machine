@@ -55,16 +55,19 @@ enum {
 	POP = 15,       // throw away top of the stack
 	HALT = 16,      // stop program
 	CALL = 17,      // call procedure
-	RET = 18        // return from procedure
+	RET = 18,      // return from procedure
+	PAUSE = 19		// pause program
 };
 
 void run(VM* vm) {
 	do {
 		int opcode = NCODE(vm);        // fetch
-		int v, addr, offset, a, b, argc, rval;
+		int v, addr, offset, a, b, argc, rval, pause_int;
 
 		switch (opcode) {   // decode
-		case HALT: return;  // stop the program
+
+		case HALT: 
+			return;  // stop the program
 
 		case CONST_I32:
 			v = NCODE(vm);   // get next value from code ...
@@ -237,7 +240,15 @@ void run(VM* vm) {
 
 		case PRINT:
 			v = POP(vm);        // pop value from top of the stack ...
-			printf("Printing top of stack: %d\n", v);  // ... and print it		
+			printf("Printing top of stack: %d\n", v);  // ... and print it					
+
+			break;
+
+		case PAUSE:		
+			do 
+			{
+				printf("Paused. Press enter to continue.\n"); // pause until enter is pressed
+			} while (getchar() != '\n');
 
 			break;
 
@@ -285,7 +296,8 @@ void main()
 		CONST_I32, 6,   // 38 - put 6 
 		CALL, fib, 1,   // 40 - call function: fib(arg) where arg = 6;
 		PRINT,          // 43 - print result
-		HALT            // 44 - stop program
+		PAUSE,			// 44 - pause program
+		HALT            // 45 - stop program
 	};
 
 	// initialize virtual machine
