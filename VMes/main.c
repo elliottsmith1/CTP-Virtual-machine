@@ -73,7 +73,7 @@ void run(VM* vm) {
 			v = NCODE(vm);   // get next value from code ...
 			PUSH(vm, v);     // ... and move it on top of the stack
 
-			printf("pushing constant int (%d)\n", v);
+			printf("\npushing constant int (%d)\n", v);
 
 			break;
 
@@ -82,7 +82,7 @@ void run(VM* vm) {
 			a = POP(vm);        // ... then get first value from top of the stack ...
 			PUSH(vm, a + b);    // ... add those two values and put result on top of the stack
 
-			printf("adding %d + %d (%d)\n", a, b, (a+b));
+			printf("\nadding %d + %d (%d)\n", a, b, (a+b));
 
 			break;
 
@@ -91,7 +91,7 @@ void run(VM* vm) {
 			a = POP(vm);        // ... then get first value from top of the stack ...
 			PUSH(vm, a - b);    // ... subtract those two values and put result on top of the stack
 
-			printf("subtracting %d - %d (%d)\n", a, b, (a-b));
+			printf("\nsubtracting %d - %d (%d)\n", a, b, (a-b));
 
 			break;
 
@@ -100,7 +100,7 @@ void run(VM* vm) {
 			a = POP(vm);        // ... then get first value from top of the stack ...
 			PUSH(vm, a * b);    // ... multiply those two values and put result on top of the stack
 
-			printf("multiplying %d * %d (%d)\n", a, b, (a*b));
+			printf("\nmultiplying %d * %d (%d)\n", a, b, (a*b));
 
 			break;
 
@@ -109,7 +109,7 @@ void run(VM* vm) {
 			a = POP(vm);        // ... then get first value from top of the stack ...
 			PUSH(vm, (a<b) ? 1 : 0); // ... compare those two values, and put result on top of the stack
 
-			printf("%d less than %d?", a, b);
+			printf("\n%d less than %d?", a, b);
 
 			if (a < b)
 			{
@@ -127,7 +127,7 @@ void run(VM* vm) {
 			a = POP(vm);        // ... then get first value from top of the stack ...
 			PUSH(vm, (a == b) ? 1 : 0); // ... compare those two values, and put result on top of the stack
 
-			printf("%d equal to %d?", a, b);
+			printf("\n%d equal to %d?", a, b);
 
 			if (a == b)
 			{
@@ -143,7 +143,7 @@ void run(VM* vm) {
 		case JMP:
 			vm->pc = NCODE(vm);  // unconditionaly jump with program counter to provided address
 
-			printf("branch\n");
+			printf("\nbranch\n");
 
 			break;
 
@@ -153,7 +153,7 @@ void run(VM* vm) {
 			{      // ... pop value from top of the stack, and if it's true ...
 				vm->pc = addr; // ... jump with program counter to provided address
 
-				printf("branch true\n");
+				printf("\nbranch true\n");
 			}			
 
 			break;
@@ -164,7 +164,7 @@ void run(VM* vm) {
 			{      // ... pop value from top of the stack, and if it's true ...
 				vm->pc = addr; // ... jump with program counter to provided address
 
-				printf("branch false\n");
+				printf("\nbranch false\n");
 			}			
 
 			break;
@@ -173,7 +173,7 @@ void run(VM* vm) {
 			offset = NCODE(vm);     // get next value from code to identify local variables offset start on the stack
 			PUSH(vm, vm->stack[vm->fp + offset]); // ... put on the top of the stack variable stored relatively to frame pointer
 
-			printf("local load\n");
+			printf("\nlocal load\n");
 
 			break;
 
@@ -182,7 +182,7 @@ void run(VM* vm) {
 			offset = NCODE(vm);     // ... get the relative pointer address from code ...
 			vm->locals[vm->fp + offset] = v;  // ... and store value at address received relatively to frame pointer
 
-			printf("store locally\n");
+			printf("\nstore locally\n");
 
 			break;
 
@@ -191,7 +191,7 @@ void run(VM* vm) {
 			v = vm->locals[addr];         // ... load value from memory of the provided addres ...
 			PUSH(vm, v);                // ... and put that value on top of the stack
 
-			printf("global load\n");
+			printf("\nload global\nvalue: %d\naddress: %d\n", v, addr);
 
 			break;
 
@@ -200,7 +200,7 @@ void run(VM* vm) {
 			addr = NCODE(vm);           // ... get pointer address from code ...
 			vm->locals[addr] = v;         // ... and store value at address received
 
-			printf("store globally\n");
+			printf("\nstore global\nvalue: %d\naddress: %d\n", v, addr);
 
 			break;
 
@@ -214,7 +214,7 @@ void run(VM* vm) {
 			vm->fp = vm->sp;  // ... set new frame pointer ...
 			vm->pc = addr;    // ... move instruction pointer to target procedure address
 
-			printf("function call\n");
+			printf("\nfunction call\n");
 
 			break;
 
@@ -227,20 +227,20 @@ void run(VM* vm) {
 			vm->sp -= argc;     // ... discard all of the args left ...
 			PUSH(vm, rval);     // ... leave return value on top of the stack
 
-			printf("function return\n");
+			printf("\nfunction return\n");
 
 			break;
 
 		case POP:
 			--vm->sp;      // throw away value at top of the stack
 
-			printf("throwing away top of stack\n");
+			printf("\nthrowing away top of stack\n");
 
 			break;
 
 		case PRINT:
 			v = POP(vm);        // pop value from top of the stack ...
-			printf("Printing top of stack: %d\n", v);  // ... and print it					
+			printf("\nPrinting top of stack: %d\n", v);  // ... and print it					
 
 			break;
 
@@ -261,61 +261,28 @@ void run(VM* vm) {
 
 void main()
 {
-	//const int fib = 0;  // address of the fibonacci procedure  
-	//int program[] = {
-	//	// int fib(n) {
-	//	//     if(n == 0) return 0;
-	//	LOAD, -3,       // 0 - load last function argument N
-	//	CONST_I32, 0,   // 2 - put 0
-	//	EQ_I32,         // 4 - check equality: N == 0
-	//	JMPF, 10,       // 5 - if they are NOT equal, goto 10
-	//	CONST_I32, 0,   // 7 - otherwise put 0
-	//	RET,            // 9 - and return it
-
-	//					//     if(n < 3) return 1;
-	//	LOAD, -3,       // 10 - load last function argument N
-	//	CONST_I32, 3,   // 12 - put 3
-	//	LT_I32,         // 14 - check if 3 is less than N
-	//	JMPF, 20,       // 15 - if 3 is NOT less than N, goto 20
-	//	CONST_I32, 1,   // 17 - otherwise put 1
-	//	RET,            // 19 - and return it
-
-	//					//     else return fib(n-1) + fib(n-2);
-	//	LOAD, -3,       // 20 - load last function argument N
-	//	CONST_I32, 1,   // 22 - put 1
-	//	SUB_I32,        // 24 - calculate: N-1, result is on the stack
-	//	CALL, fib, 1,   // 25 - call fib function with 1 arg. from the stack
-	//	LOAD, -3,       // 28 - load N again
-	//	CONST_I32, 2,   // 30 - put 2
-	//	SUB_I32,        // 32 - calculate: N-2, result is on the stack
-	//	CALL, fib, 1,   // 33 - call fib function with 1 arg. from the stack
-	//	ADD_I32,        // 36 - since 2 fibs pushed their ret values on the stack, just add them
-	//	RET,            // 37 - return from procedure
-
-	//					// entrypoint - main function
-	//	CONST_I32, 6,   // 38 - put 6 
-	//	CALL, fib, 1,   // 40 - call function: fib(arg) where arg = 6;
-	//	PRINT,          // 43 - print result
-	//	PAUSE,			// 44 - pause program
-	//	HALT            // 45 - stop program
-	//};
-
-	const int state = 1;
+	const int state = 0;
 	int program[] = {
 		
+		CONST_I32, 6,   
+		GSTORE, state,
+		CONST_I32, state,
+		GLOAD,  
+		PRINT, 
+		CONST_I32, 69,
+		GSTORE, state,
+		CONST_I32, state,
+		GLOAD,
+		PRINT,
+		PAUSE,			
+		HALT      
 
-						// entrypoint - main function
-		CONST_I32, 6,   // 0 - put 6 
-		CALL, fib, 1,   // 1 - call function: fib(arg) where arg = 6;
-		PRINT,          // 2 - print result
-		PAUSE,			// 3 - pause program
-		HALT            // 4 - stop program
 	};
 
 	// initialize virtual machine
 	VM* vm = newVM(program,   // program to execute  
 		0,    // start address of main function
-		0);    // locals to be reserved
+		1);    // locals to be reserved
 	run(vm);
 
 	//delete vm
