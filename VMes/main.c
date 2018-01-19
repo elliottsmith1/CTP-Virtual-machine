@@ -143,7 +143,7 @@ void run(VM* vm) {
 		case JMP:
 			vm->pc = NCODE(vm);  // unconditionaly jump with program counter to provided address
 
-			printf("\nbranch\n");
+			printf("\jump to opcode instruction: %d\n", NCODE(vm));
 
 			break;
 
@@ -153,7 +153,7 @@ void run(VM* vm) {
 			{      // ... pop value from top of the stack, and if it's true ...
 				vm->pc = addr; // ... jump with program counter to provided address
 
-				printf("\nbranch true\n");
+				printf("\jump true\n opcode: %d\n", addr);
 			}			
 
 			break;
@@ -164,7 +164,7 @@ void run(VM* vm) {
 			{      // ... pop value from top of the stack, and if it's true ...
 				vm->pc = addr; // ... jump with program counter to provided address
 
-				printf("\nbranch false\n");
+				printf("\jump false\n opcode: %d\n", addr);
 			}			
 
 			break;
@@ -263,19 +263,41 @@ void main()
 {
 	const int state = 0;
 	int program[] = {
-		
-		CONST_I32, 6,   
+						
+		//start - set state value to 1
+		CONST_I32, 1,
 		GSTORE, state,
+
+		//state 1 - adding to 10
 		CONST_I32, state,
-		GLOAD,  
-		PRINT, 
-		CONST_I32, 69,
+		GLOAD,
+		CONST_I32, 1,
+		ADD_I32,
 		GSTORE, state,
 		CONST_I32, state,
 		GLOAD,
-		PRINT,
-		PAUSE,			
-		HALT      
+		CONST_I32, 10,
+		EQ_I32,
+		JMPF, 4, 			
+
+		//state 2 - adding to 100
+		CONST_I32, state,
+		GLOAD,
+		CONST_I32, 10,
+		ADD_I32,
+		GSTORE, state,
+		CONST_I32, state,
+		GLOAD,
+		CONST_I32, 100,
+		EQ_I32,
+		JMPF, 20,
+		
+		//end loop
+		CONST_I32, state,
+		GLOAD,
+		PRINT,				
+		PAUSE,					
+		HALT					
 
 	};
 
